@@ -1,2 +1,2 @@
-# staruml-arrange-generalizations
-StarUML 2 Extension for Arranging Generalizations
+# staruml-arrange-specializations
+StarUML 2 Extension for Arranging Specializations
