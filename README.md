@@ -4,7 +4,7 @@ StarUML 2 Extension for Arranging Specializations
 This extension allows to arrange specialization views quickly into a rectilinear form as shown in the below figures.
 
 ![Screenshot1](https://github.com/niklauslee/staruml-arrange-specializations/blob/master/captures/screenshot1.png?raw=true)
-![Screenshot2](https://github.com/niklauslee/staruml-arrange-specializations/blob/master/captures/screenshot1.png?raw=true)
+![Screenshot2](https://github.com/niklauslee/staruml-arrange-specializations/blob/master/captures/screenshot2.png?raw=true)
 
 ## Installation
 
