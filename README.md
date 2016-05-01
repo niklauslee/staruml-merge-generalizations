@@ -12,7 +12,7 @@ Open Extension Manager *(Tools > Extension Manager)* and select *Registry* Tab a
 
 ## Usage
 
-To arrange specializations, select a Class (Superclass) first and then select **Tools > Arrange Specializations (Alt+Ctrl+G)** or click **Arrange Specializations** icon in Toolbar.
+To arrange specializations, select a Class (Superclass) first and then select **Tools > Arrange Specializations (Alt+Ctrl+S)** or click **Arrange Specializations** icon in Toolbar.
 
 ---
 
