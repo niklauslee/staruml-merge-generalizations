@@ -120,7 +120,7 @@ define(function (require, exports, module) {
 
         // Setup Menus (Add in Tools)
         var menu = MenuManager.getMenu(Commands.TOOLS);
-        menu.addMenuItem(CMD_ARRANGE_SPECIALIZATIONS, ["Ctrl-Alt-G"]);
+        menu.addMenuItem(CMD_ARRANGE_SPECIALIZATIONS, ["Ctrl-Alt-S"]);
         
     }
     
