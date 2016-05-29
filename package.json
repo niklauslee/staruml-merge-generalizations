@@ -1,9 +1,9 @@
 {
-    "name": "niklauslee.staruml-arrange-specializations",
-    "title": "Arrange Specializations",
-    "description": "Quickly arrange specializations into a rectilinear form",
-    "homepage": "https://github.com/niklauslee/staruml-arrange-specializations",
-    "issues": "https://github.com/niklauslee/staruml-arrange-specializations/issues",
+    "name": "niklauslee.staruml-merge-generalizations",
+    "title": "Merge Generalizations",
+    "description": "Quickly merge generalizations into a rectilinear form",
+    "homepage": "https://github.com/niklauslee/staruml-merge-generalizations",
+    "issues": "https://github.com/niklauslee/staruml-merge-generalizations/issues",
     "version": "0.9.0",
     "author": {
         "name": "Minkyu Lee",
