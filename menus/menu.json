@@ -1,0 +1,10 @@
+{
+  "menu": [
+    {
+      "id": "tools",
+      "submenu": [
+        { "label": "Merge Generalizations", "id": "tools.merge-generalizations", "command": "merge-generalizations:merge" }
+      ]
+    }
+  ]
+}

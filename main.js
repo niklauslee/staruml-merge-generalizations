@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 MKLab. All rights reserved.
+ * Copyright (c) 2014-2018 MKLab. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -21,109 +21,76 @@
  *
  */
 
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50, regexp: true */
-/*global define, $, _, window, app, type, appshell, document */
+const _ = require('lodash')
 
-define(function (require, exports, module) {
-    "use strict";
+// Toolbar Button
+var $button = $("<a id='toolbar-merge-generalizations' href='#' title='Merge Generalizations'></a>")
 
-    var ExtensionUtils   = app.getModule("utils/ExtensionUtils"),
-        CommandManager   = app.getModule("command/CommandManager"),
-        Commands         = app.getModule("command/Commands"),
-        MenuManager      = app.getModule("menu/MenuManager"),
-        Graphics         = app.getModule("core/Graphics"),
-        Core             = app.getModule("core/Core"),
-        Repository       = app.getModule("core/Repository"),
-        OperationBuilder = app.getModule("core/OperationBuilder"),
-        DiagramManager   = app.getModule("diagrams/DiagramManager"),
-        SelectionManager = app.getModule("engine/SelectionManager"),
-        Toast            = app.getModule("ui/Toast");
+/**
+ * Return generalization views of a given view.
+ */
+function getGeneralizations (selected) {
+  var edges = app.repository.getEdgeViewsOf(selected)
+  var results = _.filter(edges, function (e) {
+    return (e instanceof type.UMLGeneralizationView) && (e.head === selected)
+  })
+  return results
+}
 
-    // Command ID
-    var CMD_MERGE_GENERALIZATIONS = "tools.merge-generalizations";
+/**
+ * Merge generalizations
+ */
+function handleMerge () {
+  // Get a selected view
+  var views = app.selections.getSelectedViews()
+  if (views.length < 1) {
+    app.toast.info('Nothing selected.')
+    return
+  }
 
-    // Toolbar Button
-    var $button = $("<a id='toolbar-merge-generalizations' href='#' title='Merge Generalizations'></a>");
+  // Get specialization views
+  var selected = views[0]
+  var generalizations = getGeneralizations(selected)
+  if (generalizations.length < 1) {
+    app.toast.info('No generalizations to merge.')
+    return
+  }
 
+  // Compute coordinates for generalizations
+  var topLine = _.min(_.map(generalizations, function (e) { return e.tail.top }))
+  var x = Math.round((selected.left + selected.getRight()) / 2)
+  var y1 = Math.round(selected.getBottom())
+  var y2 = Math.round((topLine + selected.getBottom() + 15) / 2)
 
-    /**
-     * Return generalization views of a given view.
-     */
-    function getGeneralizations(selected) {
-        var edges = Repository.getEdgeViewsOf(selected);
-        var results = _.filter(edges, function (e) {
-            return (e instanceof type.UMLGeneralizationView) && (e.head === selected);
-        });
-        return results;
+  // Make a command and execute
+  var builder = app.repository.getOperationBuilder()
+  builder.begin('merge generalizations')
+  generalizations.forEach(function (view) {
+    if (view.lineStyle !== type.EdgeView.LS_RECTILINEAR) {
+      builder.fieldAssign(view, 'lineStyle', type.EdgeView.LS_RECTILINEAR)
     }
+    var node = view.tail
+    var _x = Math.round((node.left + node.getRight() / 2))
+    var _y = Math.round(node.top)
+    var ps = new type.Points()
+    ps.add(new type.Point(_x, _y))
+    ps.add(new type.Point(_x, y2))
+    ps.add(new type.Point(x, y2))
+    ps.add(new type.Point(x, y1))
+    builder.fieldAssign(view, 'points', ps.__write())
+  })
+  builder.end()
+  app.repository.doOperation(builder.getOperation())
+}
 
-    /**
-     * Merge generalizations
-     */
-    function merge() {
-        // Get a selected view
-        var views  = SelectionManager.getSelectedViews();
-        if (views.length < 1) {
-            Toast.info("Nothing selected.");
-            return;
-        }
+function init () {
+  // Toolbar Button
+  $('#toolbar .buttons').append($button)
+  $button.click(function () {
+    app.commands.execute('merge-generalizations:merge')
+  })
 
-        // Get specialization views
-        var selected  = views[0];
-        var generalizations = getGeneralizations(selected);
-        if (generalizations.length < 1) {
-            Toast.info("No generalizations to merge.");
-            return;
-        }
+  app.commands.register('merge-generalizations:merge', handleMerge)
+}
 
-        // Compute coordinates for generalizations
-        var topLine = _.min(_.map(generalizations, function (e) { return e.tail.top; })),
-            x       = Math.round((selected.left + selected.getRight()) / 2),
-            y1      = Math.round(selected.getBottom()),
-            y2      = Math.round((topLine + selected.getBottom() + 15) / 2);
-
-        // Make a command and execute
-        OperationBuilder.begin('merge generalizations');
-        generalizations.forEach(function (view) {
-            if (view.lineStyle !== Core.LS_RECTILINEAR) {
-                OperationBuilder.fieldAssign(view, 'lineStyle', Core.LS_RECTILINEAR);
-            }
-            var node = view.tail,
-                _x   = Math.round((node.left + node.getRight() / 2)),
-                _y   = Math.round(node.top);
-            var ps = new Graphics.Points();
-            ps.add(new Graphics.Point(_x, _y));
-            ps.add(new Graphics.Point(_x, y2));
-            ps.add(new Graphics.Point(x, y2));
-            ps.add(new Graphics.Point(x, y1));
-            OperationBuilder.fieldAssign(view, 'points', ps.__write());
-        });
-        OperationBuilder.end();
-        Repository.doOperation(OperationBuilder.getOperation());
-    }
-
-    /**
-     * Initialize Extension
-     */
-    function init() {
-        // Load our stylesheet
-        ExtensionUtils.loadStyleSheet(module, "styles.less");
-
-        // Toolbar Button
-        $("#toolbar .buttons").append($button);
-        $button.click(function () {
-            CommandManager.execute(CMD_MERGE_GENERALIZATIONS);
-        });
-
-        // Register Commands
-        CommandManager.register("Merge Generalizations", CMD_MERGE_GENERALIZATIONS, merge);
-
-        // Setup Menus (Add in Tools)
-        var menu = MenuManager.getMenu(Commands.TOOLS);
-        menu.addMenuItem(CMD_MERGE_GENERALIZATIONS, ["Ctrl-Alt-S"]);
-
-    }
-
-    init();
-
-});
+exports.init = init

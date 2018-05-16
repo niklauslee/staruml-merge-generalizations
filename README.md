@@ -1,5 +1,5 @@
-StarUML 2 Extension for Merging Generalizations
-===============================================
+StarUML Extension for Merging Generalizations
+=============================================
 
 This extension allows to merge generalization views quickly into a rectilinear form as shown in the below figures.
 
