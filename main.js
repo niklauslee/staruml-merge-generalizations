@@ -21,8 +21,6 @@
  *
  */
 
-const _ = require('lodash')
-
 // Toolbar Button
 var $button = $("<a id='toolbar-merge-generalizations' href='#' title='Merge Generalizations'></a>")
 
@@ -31,7 +29,7 @@ var $button = $("<a id='toolbar-merge-generalizations' href='#' title='Merge Gen
  */
 function getGeneralizations (selected) {
   var edges = app.repository.getEdgeViewsOf(selected)
-  var results = _.filter(edges, function (e) {
+  var results = edges.filter(function (e) {
     return (e instanceof type.UMLGeneralizationView) && (e.head === selected)
   })
   return results
@@ -57,7 +55,8 @@ function handleMerge () {
   }
 
   // Compute coordinates for generalizations
-  var topLine = _.min(_.map(generalizations, function (e) { return e.tail.top }))
+  var sorted = generalizations.map(function (e) { return e.tail.top }).sort()
+  var topLine = sorted.length > 0 ? sorted[0] : undefined
   var x = Math.round((selected.left + selected.getRight()) / 2)
   var y1 = Math.round(selected.getBottom())
   var y2 = Math.round((topLine + selected.getBottom() + 15) / 2)
